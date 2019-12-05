@@ -5,13 +5,13 @@ steps:
       BUILDKITE_DOCKER_COMPOSE_CONTAINER: app
     plugins:
       - github.latitudefinancial.com/Latitude/datadog-metrics-buildkite-plugin#v1.0.0:
-        metric: pact.contract.verified.$TEST_STATUS
-        api_key: 342423423423
-        tags:
-          - "pacticipant:ProductService"
-          - "domain:servicing"
-          - "branch:master"
-          - "version:b43bEVWQv"
-        type: count
-        value: 1
-        condition: $PACT_RAN
+          metric: pact.contract.verified.$TEST_STATUS
+          api_key: 342423423423
+          tags:
+            - "pacticipant:ProductService"
+            - "domain:servicing"
+            - "branch:master"
+            - "version:b43bEVWQv"
+          type: count
+          value: 1
+          condition: $PACT_RAN
