@@ -4,7 +4,7 @@ steps:
     env:
       BUILDKITE_DOCKER_COMPOSE_CONTAINER: app
     plugins:
-      - ./.buildkite/plugins/datadog-metrics-buildkite-plugin#latest:
+      - https://github.latitudefinancial.com/Latitude/datadog-metrics-buildkite-plugin#v1.0.0:
         - metric: pact.contract.verified.$TEST_STATUS
           api_key: 342423423423
           tag:
