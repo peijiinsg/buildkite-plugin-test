@@ -1,8 +1,6 @@
 steps:
   - label: ':hammer: Tests'
     command: 'echo "hello world!" && export PACT_RAN=true && export TEST_STATUS=failed'
-    env:
-      BUILDKITE_DOCKER_COMPOSE_CONTAINER: app
     plugins:
       - ./.buildkite/plugins/datadog-metrics-buildkite-plugin:
           metric: pact.contract.verified.$TEST_STATUS
