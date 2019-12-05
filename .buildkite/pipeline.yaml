@@ -2,7 +2,7 @@ steps:
   - label: ':hammer: Tests'
     command: 'echo "hello world!" && export PACT_RAN=true && export TEST_STATUS=failed'
     plugins:
-      - ./.buildkite/plugins/datadog-metrics-buildkite-plugin:
+      - ./.buildkite/plugins/datadog-metrics-buildkite-plugin2:
           metric: pact.contract.verified.$TEST_STATUS
           api_key: 342423423423
           tags:

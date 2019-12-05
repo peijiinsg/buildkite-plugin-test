@@ -1,0 +1,64 @@
+steps:
+  - label: ":hammer: test"
+    skip: true
+    plugins:
+      - docker-compose#v3.0.3:
+          run: tests
+    agents:
+      queue: eapi-pcinp-dev
+  - label: ":sparkles: lint"
+    plugins:
+      - plugin-linter#v2.0.0:
+          id: https://github.latitudefinancial.com/Latitude/datadog-metrics-buildkite-plugin
+    agents:
+      queue: eapi-pcinp-dev
+  - label: ":shell: Shellcheck"
+    plugins:
+      - shellcheck#v1.1.2:
+          files: hooks/**
+    agents:
+      queue: eapi-pcinp-dev
+
+  - label: ":phoenix: SonarQube Scan"
+    branches: master feature/* bugfix/*
+    command: run-scanner
+    env:
+      CONFIG: dev
+      SERVICE_NAME: datadog-metrics-buildkite-plugin
+      SONAR_ADDR: http://sonarqube.privatelink.lfscnp.com:9000
+    plugins:
+      docker#v3.0.1:
+        always-pull: true
+        image: 645186246340.dkr.ecr.ap-southeast-2.amazonaws.com/cnp-secure-pipeline-sonar:latest
+        network: cicd
+        propagate-environment: true
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /usr/local/buildkite-aws-stack/plugins/secrets:/usr/local/buildkite-aws-stack/plugins/secrets
+    soft_fail:
+      - exit_status: 1
+    agents:
+      queue: eapi-pcinp-dev
+
+  - wait
+
+  - label: ":golang: Tag and push"
+    command: make tag
+    branches: "master"
+    env:
+      AWS_DEFAULT_REGION: ap-southeast-2
+    plugins:
+      - docker#v3.0.1:
+          always-pull: true
+          debug: true
+          image: 645186246340.dkr.ecr.ap-southeast-2.amazonaws.com/cnp-secure-pipeline:latest
+          network: cicd
+          propagate-environment: true
+          environment:
+            - GIT_CONFIG_PARAMETERS
+          volumes:
+            - /dev/log:/dev/log
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /usr/local/buildkite-aws-stack/plugins/secrets/:/usr/local/buildkite-aws-stack/plugins/secrets/
+    agents:
+      queue: eapi-pcinp-dev
