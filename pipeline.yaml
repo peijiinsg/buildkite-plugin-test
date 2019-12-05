@@ -1,0 +1,15 @@
+steps:
+  - label: ":hammer: test"
+    command: echo "hello world!" && export PACT_RAN=true && export TEST_STATUS=failed
+    plugins:
+      - ./.buildkite/plugins/datadog-metrics-buildkite-plugin: ~
+        - metric: pact.contract.verified.$TEST_STATUS
+          api_key: 342423423423
+          tag:
+           - "pacticipant:ProductService"
+           - "domain:servicing"
+           - "branch:master"
+           - "version:b43bEVWQv"
+          type: count
+          value: 1
+          condition: $PACT_RAN
