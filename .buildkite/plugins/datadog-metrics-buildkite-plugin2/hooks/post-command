@@ -1,16 +1,8 @@
 #!/bin/bash
 
-echo "I WAS CALLED"
 
 if ! ${BUILDKITE_PLUGIN_DATADOG_METRICS_CONDITION}; then
   echo "datadog metric is skipped"
-  exit 0
-fi
-
-DEFAULT_DD_TAGS_CSV=$(buildkite-agent meta-data get "default_tags")
-
-if [[ -z "${DEFAULT_DD_TAGS_CSV}" ]]; then
-  buildkite-agent annotate --style "warning" --context "datadog-metrics-plugin" "Skipping Datadog metrics plugin due to missing tags. Please check the README at https://github.latitudefinancial.com/Latitude/datadog-metrics-buildkite-plugin#configuration on how to configure the plugin."
   exit 0
 fi
 
@@ -21,13 +13,14 @@ else
   if [[ -n "${BUILDKITE_PLUGIN_DATADOG_METRICS_API_KEY_PATH}" ]]; then
     DATADOG_API_KEY_PATH="${BUILDKITE_PLUGIN_DATADOG_METRICS_API_KEY_PATH}"
   fi
-
   DATADOG_API_KEY=$(aws ssm get-parameter --name "${DATADOG_API_KEY_PATH}" --with-decryption --query Parameter.Value --with-decryption --output text)
 fi
 if [[ -z "${DATADOG_API_KEY}" ]]; then
   buildkite-agent annotate --style "warning" --context "datadog-metrics-plugin" "Skippping Datadog metrics plugin due to missing api key in SSM. Please set the Datadog API key in SSM (of the account the Buildkite agent is running on) with the parameter name as '${DATADOG_API_KEY_PATH}'. You can find your API keys at https://app.datadoghq.com/account/settings#api ."
   exit 0
 fi
+
+DEFAULT_DD_TAGS_CSV=$(buildkite-agent meta-data get "default_tags")
 set -eu -o pipefail
 
 # Combine the tags into an escaped tags csv
@@ -53,5 +46,3 @@ curl  -X POST -H "Content-type: application/json" \
         ]
 }" \
 "https://api.datadoghq.com/api/v1/series?api_key=${DATADOG_API_KEY}"
-
-echo "I FINISHED"
