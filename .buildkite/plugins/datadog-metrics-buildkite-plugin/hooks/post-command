@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cat ${BUILDKITE_ENV_FILE}
 
 if ! ${BUILDKITE_PLUGIN_DATADOG_METRICS_CONDITION}; then
   echo "datadog metric is skipped"
